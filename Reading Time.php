@@ -15,66 +15,70 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-/**
- * Main Class for Reading Time Plugin
- * Using a class structure avoids function name collisions.
- */
 class SRT_Reading_Time {
 
-	/**
-	 * Constructor to initialize hooks
-	 */
 	public function __construct() {
-		// Hook into 'the_content' to add reading time before the post content
+		// 1. Hook for automatic display (optional - currently active)
 		add_filter( 'the_content', array( $this, 'add_reading_time_to_content' ) );
+
+		// 2. Register Shortcode [reading_time]
+		add_shortcode( 'reading_time', array( $this, 'reading_time_shortcode' ) );
 	}
 
 	/**
-	 * Calculate and prepend reading time
-	 *
-	 * @param string $content The post content.
-	 * @return string The modified content.
+	 * Method 1: Automatic Injection via Filter
 	 */
 	public function add_reading_time_to_content( $content ) {
-		// Only show on single posts (not on homepage or archive pages) and main query
+		// Only run on single posts and main query
 		if ( ! is_single() || ! is_main_query() ) {
 			return $content;
 		}
 
-		// Calculate reading time
-		$reading_time = $this->calculate_time( $content );
+		// Calculate time
+		$reading_time_html = $this->get_reading_time_html( $content );
 
-		// HTML for the reading time label
-		// We use esc_html__ for security and translation support
-		$html  = '<div class="srt-container" style="margin-bottom: 15px; color: #555; font-weight: bold;">';
-		$html .= '⏱ ' . esc_html__( 'Reading Time:', 'simple-reading-time' ) . ' ' . $reading_time . ' ' . esc_html__( 'min', 'simple-reading-time' );
-		$html .= '</div>';
-
-		// Prepend to content
-		return $html . $content;
+		// Add to the top of content
+		return $reading_time_html . $content;
 	}
 
 	/**
-	 * Logic to count words and estimate time
-	 * Average reading speed is ~200 words per minute.
-	 *
-	 * @param string $content
-	 * @return int
+	 * Method 2: Shortcode Callback
+	 * Usage: [reading_time]
+	 */
+	public function reading_time_shortcode() {
+		// Get current post content
+		$post = get_post();
+		if ( ! $post ) {
+			return '';
+		}
+
+		// Return the HTML logic
+		return $this->get_reading_time_html( $post->post_content );
+	}
+
+	/**
+	 * Helper: Generate the HTML output
+	 * Keeping logic in one place (DRY Principle)
+	 */
+	private function get_reading_time_html( $content ) {
+		$time = $this->calculate_time( $content );
+
+		$html  = '<div class="srt-container" style="display: inline-block; padding: 5px 10px; background: #f1f1f1; border-radius: 5px; margin-bottom: 10px;">';
+		$html .= '⏱ ' . esc_html__( 'Reading Time:', 'simple-reading-time' ) . ' <strong>' . $time . ' ' . esc_html__( 'min', 'simple-reading-time' ) . '</strong>';
+		$html .= '</div>';
+
+		return $html;
+	}
+
+	/**
+	 * Helper: Math Logic
 	 */
 	private function calculate_time( $content ) {
-		// Strip HTML tags to count only text
 		$clean_content = strip_tags( $content );
-		
-		// Count words
-		$word_count = str_word_count( $clean_content );
-		
-		// Calculate time (Words / 200) and round up (ceil)
-		$time = ceil( $word_count / 200 );
-
-		// Ensure at least 1 minute is shown
+		$word_count    = str_word_count( $clean_content );
+		$time          = ceil( $word_count / 200 );
 		return max( 1, $time );
 	}
 }
 
-// Initialize the plugin
 new SRT_Reading_Time();
