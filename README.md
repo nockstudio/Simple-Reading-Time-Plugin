@@ -21,5 +21,11 @@ This plugin demonstrates:
 - Security checks (`ABSPATH`, `esc_html__`).
 - Object-Oriented Programming (OOP) in WordPress.
 
+Usage
+You can use this plugin in two ways:
+1. Automatic Mode: The reading time is automatically added to the top of every single post.
+2. Shortcode Mode: Use the shortcode `[reading_time]` anywhere in your posts, pages, or widgets.
+   Example: Great for placing inside **Elementor** or Custom Layouts.
+
 👨‍💻 Author
 Developed by NockStudio 
