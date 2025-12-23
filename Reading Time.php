@@ -3,7 +3,7 @@
  * Plugin Name: Simple Reading Time
  * Plugin URI:  https://github.com/nockstudio/Simple-Reading-Time-Plugin
  * Description: Automatically calculates and displays the estimated reading time for blog posts.
- * Version:     1.0.0
+ * Version:     1.0.1
  * Author:      Nockstudio
  * Author URI:  https://github.com/nockstudio/
  * License:     GPL2
